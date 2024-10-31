@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Quiz</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+        }
+
+        .quiz-container {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+            max-width: 600px;
+            width: 100%;
+        }
+
+        .quiz-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            color: #2d3748;
+            font-size: 24px;
+            margin: 0;
+        }
+
+        .progress-bar {
+            height: 6px;
+            background: #e2e8f0;
+            margin: 20px 0;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .progress {
+            height: 100%;
+            background: #667eea;
+            width: 0;
+            transition: width 0.3s ease;
+        }
+
+        .question {
+            margin-bottom: 25px;
+        }
+
+        .question-text {
+            font-size: 18px;
+            color: #2d3748;
+            margin-bottom: 15px;
+            font-weight: 500;
+        }
+
+        .options {
+            display: grid;
+            gap: 10px;
+        }
+
+        .option {
+            padding: 15px;
+            background: #f7fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .option:hover {
+            background: #edf2f7;
+            border-color: #cbd5e0;
+        }
+
+        .option.selected {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .option.correct {
+            background: #48bb78;
+            color: white;
+            border-color: #48bb78;
+        }
+
+        .option.wrong {
+            background: #f56565;
+            color: white;
+            border-color: #f56565;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+
+        button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background 0.3s ease;
+        }
+
+        button:hover {
+            background: #5a67d8;
+        }
+
+        button:disabled {
+            background: #cbd5e0;
+            cursor: not-allowed;
+        }
+
+        .result {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .score {
+            font-size: 24px;
+            font-weight: bold;
+            color: #2d3748;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="quiz-container">
+        <div class="quiz-header">
+            <h1>Knowledge Quiz</h1>
+            <div class="progress-bar">
+                <div class="progress"></div>
+            </div>
+        </div>
+        <div id="quiz-content"></div>
+    </div>
+
+    <script>
+        const quizData = [
+            {
+                question: "What is the capital of France?",
+                options: ["London", "Berlin", "Paris", "Madrid"],
+                correct: 2
+            },
+            {
+                question: "Which planet is known as the Red Planet?",
+                options: ["Venus", "Mars", "Jupiter", "Saturn"],
+                correct: 1
+            },
+            {
+                question: "What is the largest mammal in the world?",
+                options: ["African Elephant", "Blue Whale", "Giraffe", "Polar Bear"],
+                correct: 1
+            },
+            {
+                question: "Who painted the Mona Lisa?",
+                options: ["Vincent van Gogh", "Pablo Picasso", "Leonardo da Vinci", "Michelangelo"],
+                correct: 2
+            }
+        ];
+
+        class Quiz {
+            constructor(data) {
+                this.quizData = data;
+                this.currentQuestion = 0;
+                this.score = 0;
+                this.quizContent = document.getElementById('quiz-content');
+                this.init();
+            }
+
+            init() {
+                this.showQuestion();
+                this.updateProgress();
+            }
+
+            showQuestion() {
+                if (this.currentQuestion >= this.quizData.length) {
+                    this.showResults();
+                    return;
+                }
+
+                const question = this.quizData[this.currentQuestion];
+                const template = `
+                    <div class="question">
+                        <div class="question-text">${question.question}</div>
+                        <div class="options">
+                            ${question.options.map((option, index) => `
+                                <div class="option" data-index="${index}">${option}</div>
+                            `).join('')}
+                        </div>
+                    </div>
+                    <div class="controls">
+                        <button id="next-btn" disabled>Next Question</button>
+                    </div>
+                `;
+
+                this.quizContent.innerHTML = template;
+                this.addEventListeners();
+            }
+
+            addEventListeners() {
+                const options = document.querySelectorAll('.option');
+                const nextBtn = document.getElementById('next-btn');
+
+                options.forEach(option => {
+                    option.addEventListener('click', () => {
+                        if (option.classList.contains('correct') || option.classList.contains('wrong')) {
+                            return;
+                        }
+
+                        const selectedIndex = parseInt(option.dataset.index);
+                        const correct = this.quizData[this.currentQuestion].correct;
+
+                        options.forEach(opt => opt.classList.remove('selected'));
+                        option.classList.add('selected');
+
+                        if (selectedIndex === correct) {
+                            option.classList.add('correct');
+                            this.score++;
+                        } else {
+                            option.classList.add('wrong');
+                            options[correct].classList.add('correct');
+                        }
+
+                        nextBtn.disabled = false;
+                    });
+                });
+
+                nextBtn.addEventListener('click', () => {
+                    this.currentQuestion++;
+                    this.showQuestion();
+                    this.updateProgress();
+                });
+            }
+
+            updateProgress() {
+                const progress = document.querySelector('.progress');
+                const progressPercentage = (this.currentQuestion / this.quizData.length) * 100;
+                progress.style.width = `${progressPercentage}%`;
+            }
+
+            showResults() {
+                const template = `
+                    <div class="result">
+                        <h2>Quiz Completed!</h2>
+                        <div class="score">Your Score: ${this.score}/${this.quizData.length}</div>
+                        <button onclick="location.reload()">Restart Quiz</button>
+                    </div>
+                `;
+                this.quizContent.innerHTML = template;
+            }
+        }
+
+        // Initialize the quiz
+        const quiz = new Quiz(quizData);
+    </script>
+</body>
+</html>
