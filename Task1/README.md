@@ -1,13 +1,14 @@
 
 # Requried task
 
-
-The first task is a landing page, you are required to work only with pure html css without any ui framework, the design is there and it has everything you will need.
 ### 1ST TASK
-📍The second task is an image gallery, a group of images of your choice, and it is forbidden to use any library, of course, we will make this slider html css js.  <br>
+The first task is a landing page, you are required to work only with pure html css without any ui framework, the design is there and it has everything you will need.
+
 ### 2ND TASK
-📍The third task is a simple quiz, it needs focus and we will solve it without rushing.  <br>
+📍The second task is an image gallery, a group of images of your choice, and it is forbidden to use any library, of course, we will make this slider html css js.  <br>
 ### 3RD TASK
+📍The third task is a simple quiz, it needs focus and we will solve it without rushing.  <br>
+### 4TH TASK
 📍The fourth task is the important one, the code is there and it just needs you to rebuild it, do not add anything, whether in the code or the design, but shorten it as much as you can and adjust the code, and organize the project, and good luck to all of you
 
 
